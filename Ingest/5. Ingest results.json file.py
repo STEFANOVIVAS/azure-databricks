@@ -4,6 +4,14 @@
 
 # COMMAND ----------
 
+# MAGIC %run "../Includes/Configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../Includes/Commom_functions"
+
+# COMMAND ----------
+
 from pyspark.sql.types import StructType,StructField,IntegerType,StringType,FloatType
 
 
@@ -30,7 +38,7 @@ results_schema=StructType(fields=[StructField("resultId",IntegerType(),False),
 
 # COMMAND ----------
 
-results_df=spark.read.schema(results_schema).json("/mnt/formula1projectlake/raw/results.json")
+results_df=spark.read.schema(results_schema).json(f"{raw_folder_path}/results.json")
 
 # COMMAND ----------
 
@@ -43,11 +51,11 @@ display(results_df)
 
 # COMMAND ----------
 
-from pyspark.sql.functions import current_timestamp,col
+from pyspark.sql.functions import col
 
 # COMMAND ----------
 
-results_renamed_df=results_df.withColumnRenamed("resultId","result_id").withColumnRenamed("raceId","race_id").withColumnRenamed("driverId","driver_id").withColumnRenamed("constructorId","constructor_id").withColumnRenamed("positionText","position_text").withColumnRenamed("positionOrder", "position_order").withColumnRenamed("fastestLap","fastest_lap").withColumnRenamed("fastestLapTime", "fastest_lap_time").withColumnRenamed("fastestLapSpeed","fastest_lap_speed").withColumn("ingestion_date",current_timestamp())
+results_renamed_df=add_ingestion_date(results_df).withColumnRenamed("resultId","result_id").withColumnRenamed("raceId","race_id").withColumnRenamed("driverId","driver_id").withColumnRenamed("constructorId","constructor_id").withColumnRenamed("positionText","position_text").withColumnRenamed("positionOrder", "position_order").withColumnRenamed("fastestLap","fastest_lap").withColumnRenamed("fastestLapTime", "fastest_lap_time").withColumnRenamed("fastestLapSpeed","fastest_lap_speed")
 
 # COMMAND ----------
 
@@ -65,7 +73,7 @@ results_final_df=results_renamed_df.drop(col('statusId'))
 
 # COMMAND ----------
 
-results_final_df.write.mode("overwrite").partitionBy("race_id").parquet("/mnt/formula1projectlake/processed/results/")
+results_final_df.write.mode("overwrite").partitionBy("race_id").parquet(f"{processed_folder_path}/results/")
 
 # COMMAND ----------
 

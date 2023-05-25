@@ -4,11 +4,11 @@
 
 # COMMAND ----------
 
-
+# MAGIC %run "../Includes/Configuration"
 
 # COMMAND ----------
 
-display(qualifying_df)
+# MAGIC %run "../Includes/Commom_functions"
 
 # COMMAND ----------
 
@@ -31,7 +31,7 @@ qualifying_schema=StructType(fields=[StructField("raceId",IntegerType(),False),
 
 # COMMAND ----------
 
-qualifying_df=spark.read.option("multiline",True).json("/mnt/formula1projectlake/raw/qualifying/")
+qualifying_df=spark.read.option("multiline",True).json(f"{raw_folder_path}/qualifying/")
 
 # COMMAND ----------
 
@@ -44,11 +44,7 @@ display(qualifying_df)
 
 # COMMAND ----------
 
-from pyspark.sql.functions import current_timestamp,col
-
-# COMMAND ----------
-
-qualifying_final_df=qualifying_df.withColumnRenamed("driverId","driver_id").withColumnRenamed("raceId","race_id").withColumnRenamed("constructorId","constructor_id").withColumnRenamed("qualifyId","qualify_id").withColumn("ingestion_date",current_timestamp())
+qualifying_final_df=add_ingestion_date(qualifying_df).withColumnRenamed("driverId","driver_id").withColumnRenamed("raceId","race_id").withColumnRenamed("constructorId","constructor_id").withColumnRenamed("qualifyId","qualify_id")
 
 # COMMAND ----------
 
@@ -61,7 +57,7 @@ display(qualifying_final_df)
 
 # COMMAND ----------
 
-qualifying_final_df.write.mode("overwrite").parquet("/mnt/formula1projectlake/processed/qualifying/")
+qualifying_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/qualifying/")
 
 # COMMAND ----------
 

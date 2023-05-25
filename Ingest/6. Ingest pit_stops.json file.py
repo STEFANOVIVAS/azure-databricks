@@ -4,6 +4,14 @@
 
 # COMMAND ----------
 
+# MAGIC %run "../Includes/Configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../Includes/Commom_functions"
+
+# COMMAND ----------
+
 from pyspark.sql.types import StructType,StructField,IntegerType,StringType,DateType
 
 
@@ -21,7 +29,7 @@ pit_stops_schema=StructType(fields=[StructField("raceId",IntegerType(),False),
 
 # COMMAND ----------
 
-pit_stops_df=spark.read.schema(pit_stops_schema).option("multiline",True).json("/mnt/formula1projectlake/raw/pit_stops.json")
+pit_stops_df=spark.read.schema(pit_stops_schema).option("multiline",True).json(f"{raw_folder_path}/pit_stops.json")
 
 # COMMAND ----------
 
@@ -34,11 +42,7 @@ display(pit_stops_df)
 
 # COMMAND ----------
 
-from pyspark.sql.functions import current_timestamp,col
-
-# COMMAND ----------
-
-pit_stops_final_df=pit_stops_df.withColumnRenamed("driverId","driver_id").withColumnRenamed("raceId","race_id").withColumn("ingestion_date",current_timestamp())
+pit_stops_final_df=add_ingestion_date(pit_stops_df).withColumnRenamed("driverId","driver_id").withColumnRenamed("raceId","race_id")
 
 # COMMAND ----------
 
@@ -47,7 +51,7 @@ pit_stops_final_df=pit_stops_df.withColumnRenamed("driverId","driver_id").withCo
 
 # COMMAND ----------
 
-pit_stops_final_df.write.mode("overwrite").parquet("/mnt/formula1projectlake/processed/pit_stops/")
+pit_stops_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/pit_stops/")
 
 # COMMAND ----------
 
