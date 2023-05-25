@@ -4,6 +4,14 @@
 
 # COMMAND ----------
 
+# MAGIC %run "../Includes/Configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../Includes/Commom_functions"
+
+# COMMAND ----------
+
 from pyspark.sql.types import StructType,StructField,IntegerType,StringType
 
 
@@ -20,7 +28,7 @@ lap_times_schema=StructType(fields=[StructField("raceId",IntegerType(),False),
 
 # COMMAND ----------
 
-lap_times_df=spark.read.schema(lap_times_schema).csv("/mnt/formula1projectlake/raw/lap_times")
+lap_times_df=spark.read.schema(lap_times_schema).csv(f"{raw_folder_path}/lap_times")
 
 # COMMAND ----------
 
@@ -33,11 +41,7 @@ display(lap_times_df)
 
 # COMMAND ----------
 
-from pyspark.sql.functions import current_timestamp,col
-
-# COMMAND ----------
-
-lap_times_final_df=lap_times_df.withColumnRenamed("driverId","driver_id").withColumnRenamed("raceId","race_id").withColumn("ingestion_date",current_timestamp())
+lap_times_final_df=add_ingestion_date(lap_times_df).withColumnRenamed("driverId","driver_id").withColumnRenamed("raceId","race_id")
 
 # COMMAND ----------
 
@@ -50,7 +54,7 @@ display(lap_times_final_df)
 
 # COMMAND ----------
 
-lap_times_final_df.write.mode("overwrite").parquet("/mnt/formula1projectlake/processed/lap_times")
+lap_times_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/lap_times")
 
 # COMMAND ----------
 

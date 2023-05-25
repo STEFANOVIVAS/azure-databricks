@@ -4,6 +4,14 @@
 
 # COMMAND ----------
 
+# MAGIC %run "../Includes/Configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../Includes/Commom_functions"
+
+# COMMAND ----------
+
 from pyspark.sql.types import StructType,StructField,IntegerType,StringType,DateType
 
 # COMMAND ----------
@@ -25,7 +33,7 @@ driver_schema=StructType(fields=[StructField("code",StringType(),True),
 
 # COMMAND ----------
 
-drivers_df=spark.read.schema(driver_schema).json('/mnt/formula1projectlake/raw/drivers.json')
+drivers_df=spark.read.schema(driver_schema).json(f'{raw_folder_path}/drivers.json')
 
 # COMMAND ----------
 
@@ -38,7 +46,7 @@ from pyspark.sql.functions import col,current_timestamp,concat,lit
 
 # COMMAND ----------
 
-drivers_renamed_df=drivers_df.withColumnRenamed("driverId","driver_id").withColumnRenamed("driverRef","driver_ref").withColumn("name",concat(col("name.forename"),lit(" "), col("name.surname"))).withColumn("ingestion_date",current_timestamp())
+drivers_renamed_df=add_ingestion_date(drivers_df).withColumnRenamed("driverId","driver_id").withColumnRenamed("driverRef","driver_ref").withColumn("name",concat(col("name.forename"),lit(" "), col("name.surname")))
 
 # COMMAND ----------
 
@@ -60,7 +68,7 @@ display(drivers_final_df)
 
 # COMMAND ----------
 
-drivers_final_df.write.mode("overwrite").parquet("/mnt/formula1projectlake/processed/drivers")
+drivers_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/drivers")
 
 # COMMAND ----------
 

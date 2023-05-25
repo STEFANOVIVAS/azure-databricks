@@ -4,6 +4,14 @@
 
 # COMMAND ----------
 
+# MAGIC %run "../Includes/Configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../Includes/Commom_functions"
+
+# COMMAND ----------
+
 from pyspark.sql.types import StructType,StructField,IntegerType,DoubleType,StringType
 
 # COMMAND ----------
@@ -19,7 +27,7 @@ races_schema=StructType(fields=[StructField("raceId",IntegerType(),False),
 
 # COMMAND ----------
 
-circuits_df=spark.read.option("header",True).schema(races_schema).csv('/mnt/formula1projectlake/raw/races.csv')
+circuits_df=spark.read.option("header",True).schema(races_schema).csv(f'{raw_folder_path}/races.csv')
 
 # COMMAND ----------
 
@@ -32,11 +40,11 @@ display(circuits_df)
 
 # COMMAND ----------
 
-from pyspark.sql.functions import current_timestamp,to_timestamp,concat,col,lit
+from pyspark.sql.functions import to_timestamp,concat,col,lit
 
 # COMMAND ----------
 
-races_transform_df=circuits_df.withColumn("race_timestamp",to_timestamp(concat(col("date"),lit(" "),col("time")),'yyyy-MM-dd HH:mm:ss')).withColumn("ingestion_date",current_timestamp())
+races_transform_df=add_ingestion_date(circuits_df).withColumn("race_timestamp",to_timestamp(concat(col("date"),lit(" "),col("time")),'yyyy-MM-dd HH:mm:ss'))
 
 # COMMAND ----------
 
@@ -75,9 +83,4 @@ display(races_final_df)
 
 # COMMAND ----------
 
-races_final_df.write.mode("overwrite").parquet("/mnt/formula1projectlake/processed/races")
-
-# COMMAND ----------
-
-# MAGIC %fs
-# MAGIC ls /mnt/formula1projectlake/processed/races
+races_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/races")

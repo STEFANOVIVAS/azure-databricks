@@ -4,6 +4,14 @@
 
 # COMMAND ----------
 
+# MAGIC %run "../Includes/Configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../Includes/Commom_functions" 
+
+# COMMAND ----------
+
 from pyspark.sql.types import StructType,StructField,IntegerType,DoubleType,StringType
 
 # COMMAND ----------
@@ -20,7 +28,7 @@ circuits_schema=StructType(fields=[StructField("circuitId",IntegerType(),False),
 
 # COMMAND ----------
 
-circuits_df=spark.read.option("header",True).schema(circuits_schema).csv('dbfs:/mnt/formula1projectlake/raw/circuits.csv')
+circuits_df=spark.read.option("header",True).schema(circuits_schema).csv(f'{raw_folder_path}/circuits.csv')
 
 # COMMAND ----------
 
@@ -63,11 +71,7 @@ display(circuits_renamed_df)
 
 # COMMAND ----------
 
-from pyspark.sql.functions import current_timestamp
-
-# COMMAND ----------
-
-circuits_final_df=circuits_renamed_df.withColumn("ingestion_date",current_timestamp())
+circuits_final_df=add_ingestion_date(circuits_renamed_df)
 
 # COMMAND ----------
 
@@ -80,12 +84,7 @@ display(circuits_final_df)
 
 # COMMAND ----------
 
-circuits_final_df.write.mode("overwrite").parquet("/mnt/formula1projectlake/processed/circuits")
-
-# COMMAND ----------
-
-# MAGIC %fs
-# MAGIC ls /mnt/formula1projectlake/processed/circuits
+circuits_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/circuits")
 
 # COMMAND ----------
 

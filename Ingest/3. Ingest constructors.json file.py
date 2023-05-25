@@ -4,19 +4,19 @@
 
 # COMMAND ----------
 
+# MAGIC %run "../Includes/Configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../Includes/Commom_functions"
+
+# COMMAND ----------
+
 constructors_schema="constructorId INT, constructorRef STRING, name STRING, nationality STRING, url STRING"
 
 # COMMAND ----------
 
-constructors_df=spark.read.schema(constructors_schema).json("/mnt/formula1projectlake/raw/constructors.json")
-
-# COMMAND ----------
-
-constructors_df.printSchema()
-
-# COMMAND ----------
-
-display(constructors_df)
+constructors_df=spark.read.schema(constructors_schema).json(f"{raw_folder_path}/constructors.json")
 
 # COMMAND ----------
 
@@ -34,11 +34,7 @@ constructors_dropped_df=constructors_df.drop('url')
 
 # COMMAND ----------
 
-from pyspark.sql.functions import current_timestamp
-
-# COMMAND ----------
-
-constructros_rename_df=constructors_dropped_df.withColumnRenamed("constructorId","constructor_id").withColumnRenamed("constructorRef","constructor_ref").withColumn("ingestion_date",current_timestamp())
+constructros_rename_df=add_ingestion_date(constructors_dropped_df).withColumnRenamed("constructorId","constructor_id").withColumnRenamed("constructorRef","constructor_ref")
 
 # COMMAND ----------
 
@@ -51,7 +47,7 @@ display(constructros_rename_df)
 
 # COMMAND ----------
 
-constructros_rename_df.write.mode("overwrite").parquet("/mnt/formula1projectlake/processed/constructors")
+constructros_rename_df.write.mode("overwrite").parquet(f"{processed_folder_path}/constructors")
 
 # COMMAND ----------
 
