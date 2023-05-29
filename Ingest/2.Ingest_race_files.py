@@ -57,7 +57,7 @@ display(races_transform_df)
 
 # COMMAND ----------
 
-races_selected_df=races_transform_df.select(col("raceId"),col("year"),col("round"),col("circuitId"),col("name"),col("race_timestamp"),col("ingestion_date"))
+races_selected_df=races_transform_df.select(col("raceId"),col("year"),col("round"),col("circuitId"),col("name"),col("date"),col("race_timestamp"),col("ingestion_date"))
 
 # COMMAND ----------
 
