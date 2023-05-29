@@ -1,2 +1,2 @@
 # azure-databricks
-Learning databricks with project based course
+Learning Databricks and Spark with project based course
