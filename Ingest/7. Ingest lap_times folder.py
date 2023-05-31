@@ -32,6 +32,10 @@ lap_times_df=spark.read.schema(lap_times_schema).csv(f"{raw_folder_path}/lap_tim
 
 # COMMAND ----------
 
+lap_times_df.printSchema()
+
+# COMMAND ----------
+
 display(lap_times_df)
 
 # COMMAND ----------

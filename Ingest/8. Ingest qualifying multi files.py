@@ -35,6 +35,10 @@ qualifying_df=spark.read.option("multiline",True).json(f"{raw_folder_path}/quali
 
 # COMMAND ----------
 
+qualifying_df.printSchema()
+
+# COMMAND ----------
+
 display(qualifying_df)
 
 # COMMAND ----------

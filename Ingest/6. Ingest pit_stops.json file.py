@@ -33,6 +33,10 @@ pit_stops_df=spark.read.schema(pit_stops_schema).option("multiline",True).json(f
 
 # COMMAND ----------
 
+pit_stops_df.printSchema()
+
+# COMMAND ----------
+
 display(pit_stops_df)
 
 # COMMAND ----------
