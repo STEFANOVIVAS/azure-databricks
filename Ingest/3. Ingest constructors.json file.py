@@ -47,7 +47,7 @@ display(constructros_rename_df)
 
 # COMMAND ----------
 
-constructros_rename_df.write.mode("overwrite").parquet(f"{processed_folder_path}/constructors")
+constructros_rename_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.constructors")
 
 # COMMAND ----------
 
