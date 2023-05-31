@@ -37,6 +37,10 @@ drivers_df=spark.read.schema(driver_schema).json(f'{raw_folder_path}/drivers.jso
 
 # COMMAND ----------
 
+drivers_df.printSchema()
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC #### Step 2 - Rename columns, concat name colmun and create ingestion date column
 

@@ -42,6 +42,10 @@ results_df=spark.read.schema(results_schema).json(f"{raw_folder_path}/results.js
 
 # COMMAND ----------
 
+results_df.printSchema()
+
+# COMMAND ----------
+
 display(results_df)
 
 # COMMAND ----------
