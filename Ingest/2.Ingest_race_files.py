@@ -83,4 +83,8 @@ display(races_final_df)
 
 # COMMAND ----------
 
-races_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/races")
+races_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.races")
+
+# COMMAND ----------
+
+
