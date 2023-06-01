@@ -51,7 +51,7 @@ display(results_final_df.filter("race_year=2020 and race_name='Abu Dhabi Grand P
 
 # COMMAND ----------
 
-results_final_df.write.mode("overwrite").parquet(f"{presentation_folder_path}/race_results")
+results_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_presentation.race_results")
 
 # COMMAND ----------
 
