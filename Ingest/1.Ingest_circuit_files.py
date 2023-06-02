@@ -4,6 +4,16 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("param_data_source","")
+var_data_source=dbutils.widgets.get("param_data_source")
+
+# COMMAND ----------
+
+dbutils.widgets.text("param_file_date","2021-03-21")
+var_file_date=dbutils.widgets.get("param_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "../Includes/Configuration"
 
 # COMMAND ----------
@@ -28,7 +38,7 @@ circuits_schema=StructType(fields=[StructField("circuitId",IntegerType(),False),
 
 # COMMAND ----------
 
-circuits_df=spark.read.option("header",True).schema(circuits_schema).csv(f'{raw_folder_path}/circuits.csv')
+circuits_df=spark.read.option("header",True).schema(circuits_schema).csv(f'{raw_folder_path}/{var_file_date}/circuits.csv')
 
 # COMMAND ----------
 
@@ -41,7 +51,7 @@ display(circuits_df)
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col,lit
 
 # COMMAND ----------
 
@@ -58,7 +68,7 @@ display(circuits_selected_df)
 
 # COMMAND ----------
 
-circuits_renamed_df=circuits_selected_df.withColumnRenamed("circuitId","circuit_id").withColumnRenamed("circuitRef","circuit_ref").withColumnRenamed("lat","latitude").withColumnRenamed("lng","longitude").withColumnRenamed("alt","altitude")
+circuits_renamed_df=circuits_selected_df.withColumnRenamed("circuitId","circuit_id").withColumnRenamed("circuitRef","circuit_ref").withColumnRenamed("lat","latitude").withColumnRenamed("lng","longitude").withColumnRenamed("alt","altitude").withColumn("data_source",lit(var_data_source)).withColumn("file_date",lit(var_file_date))
 
 # COMMAND ----------
 
