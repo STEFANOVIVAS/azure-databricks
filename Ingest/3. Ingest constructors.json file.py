@@ -65,4 +65,4 @@ constructros_rename_df.write.mode("overwrite").format("parquet").saveAsTable("f1
 
 # COMMAND ----------
 
-
+dbutils.notebook.exit("Success")

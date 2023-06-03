@@ -97,4 +97,4 @@ races_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_process
 
 # COMMAND ----------
 
-
+dbutils.notebook.exit("Success")
