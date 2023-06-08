@@ -21,19 +21,19 @@ from pyspark.sql.functions import current_timestamp
 
 # COMMAND ----------
 
-races_df=spark.read.parquet(f'{processed_folder_path}/races').withColumnRenamed("name","race_name").withColumnRenamed("date","race_date")
+races_df=spark.read.format("delta").load(f'{processed_folder_path}/races').withColumnRenamed("name","race_name").withColumnRenamed("date","race_date")
 
 # COMMAND ----------
 
-circuits_df=spark.read.parquet(f'{processed_folder_path}/circuits').withColumnRenamed("location","circuit_location")
+circuits_df=spark.read.format("delta").load(f'{processed_folder_path}/circuits').withColumnRenamed("location","circuit_location")
 
 # COMMAND ----------
 
-drivers_df=spark.read.parquet(f"{processed_folder_path}/drivers").withColumnRenamed("name","driver_name").withColumnRenamed("nationality","driver_nationality").withColumnRenamed("number","driver_number")
+drivers_df=spark.read.format("delta").load(f"{processed_folder_path}/drivers").withColumnRenamed("name","driver_name").withColumnRenamed("nationality","driver_nationality").withColumnRenamed("number","driver_number")
 
 # COMMAND ----------
 
-constructors_df=spark.read.parquet(f"{processed_folder_path}/constructors").withColumnRenamed("name","constructor_team")
+constructors_df=spark.read.format("delta").load(f"{processed_folder_path}/constructors").withColumnRenamed("name","constructor_team")
 
 # COMMAND ----------
 
@@ -42,7 +42,7 @@ constructors_df=spark.read.parquet(f"{processed_folder_path}/constructors").with
 
 # COMMAND ----------
 
-results_df=spark.read.parquet(f"{processed_folder_path}/results").filter(f"file_date = '{var_file_date}'").withColumnRenamed("time","race_time").withColumnRenamed("race_id","race_result_id").withColumnRenamed("file_date","results_file_date")
+results_df=spark.read.format("delta").load(f"{processed_folder_path}/results").filter(f"file_date = '{var_file_date}'").withColumnRenamed("time","race_time").withColumnRenamed("race_id","race_result_id").withColumnRenamed("file_date","results_file_date")
 
 # COMMAND ----------
 
@@ -68,7 +68,8 @@ results_final_df=race_results_df.select("race_id","race_year","race_name","race_
 
 # COMMAND ----------
 
-overwrite_partition(results_final_df, 'f1_presentation','race_results','race_id')
+merge_condition="oldData.race_id=newData.race_id and oldData.driver_name=newData.driver_name"
+merge_delta_data('f1_presentation','race_results',presentation_folder_path,results_final_df,'race_id',merge_condition)
 
 # COMMAND ----------
 

@@ -17,7 +17,7 @@ var_file_date=dbutils.widgets.get("param_file_date")
 
 # COMMAND ----------
 
-rece_results_list=spark.read.parquet(f"{presentation_folder_path}/race_results").filter(f"file_date = '{var_file_date}'").select ("race_year").distinct().collect()
+rece_results_list=spark.read.format("delta").load(f"{presentation_folder_path}/race_results").filter(f"file_date = '{var_file_date}'").select ("race_year").distinct().collect()
 
 # COMMAND ----------
 
@@ -30,13 +30,13 @@ for race_year in rece_results_list:
 
 from pyspark.sql.functions import col
 
-drivers_df=spark.read.parquet(f"{presentation_folder_path}/race_results").filter(col("race_year").isin(race_year_list))
+drivers_df=spark.read.format("delta").load(f"{presentation_folder_path}/race_results").filter(col("race_year").isin(race_year_list))
 
 # COMMAND ----------
 
 from pyspark.sql.functions import sum,col,count,when
 
-drivers_standings_df=drivers_df.groupBy("race_year","driver_name","driver_nationality","constructor_team").agg(sum("points").alias("total_points"),count(when(col("position")==1,True)).alias("wins"))
+drivers_standings_df=drivers_df.groupBy("race_year","driver_name","driver_nationality").agg(sum("points").alias("total_points"),count(when(col("position")==1,True)).alias("wins"))
 
 # COMMAND ----------
 
@@ -50,5 +50,17 @@ final_df=drivers_standings_df.withColumn("rank",rank().over(driver_rank_spec))
 
 # COMMAND ----------
 
-overwrite_partition(final_df,'f1_presentation','driver_standings','race_year')
+merge_condition="oldData.race_year=newData.race_year and oldData.driver_name=newData.driver_name"
+merge_delta_data('f1_presentation','driver_standings',presentation_folder_path,drivers_standings_df,'race_year',merge_condition)
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC
+# MAGIC SELECT * FROM f1_presentation.driver_standings
+# MAGIC WHERE race_year=2021
+# MAGIC ORDER BY total_points DESC
+
+# COMMAND ----------
+
 
