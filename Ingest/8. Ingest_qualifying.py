@@ -75,11 +75,8 @@ display(qualifying_final_df)
 
 # COMMAND ----------
 
-overwrite_partition(qualifying_final_df, 'f1_processed','qualifying','race_id')
-
-# COMMAND ----------
-
-dbutils.notebook.exit("Success")
+merge_condition="oldData.qualify_id=newData.qualify_id and oldData.race_id=newData.race_id"
+merge_delta_data('f1_processed','qualifying',processed_folder_path,qualifying_final_df,'race_id',merge_condition)
 
 # COMMAND ----------
 
@@ -91,4 +88,4 @@ dbutils.notebook.exit("Success")
 
 # COMMAND ----------
 
-
+dbutils.notebook.exit("Success")

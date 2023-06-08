@@ -61,7 +61,12 @@ display(constructros_rename_df)
 
 # COMMAND ----------
 
-constructros_rename_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.constructors")
+constructros_rename_df.write.mode("overwrite").format("delta").saveAsTable("f1_processed.constructors")
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT * FROM f1_processed.constructors
 
 # COMMAND ----------
 

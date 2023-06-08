@@ -72,11 +72,8 @@ display(lap_times_final_df)
 
 # COMMAND ----------
 
-overwrite_partition(lap_times_final_df, 'f1_processed','lap_times','race_id')
-
-# COMMAND ----------
-
-dbutils.notebook.exit("Success")
+merge_condition="oldData.race_id=newData.race_id and oldData.driver_id=newData.driver_id and oldData.lap=newData.lap"
+merge_delta_data('f1_processed','lap_times',processed_folder_path,lap_times_final_df,'race_id',merge_condition)
 
 # COMMAND ----------
 
@@ -88,4 +85,4 @@ dbutils.notebook.exit("Success")
 
 # COMMAND ----------
 
-
+dbutils.notebook.exit("Success")

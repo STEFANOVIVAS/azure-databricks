@@ -84,16 +84,17 @@ races_final_df=races_selected_df.withColumnRenamed("raceId","race_id").withColum
 
 # COMMAND ----------
 
-display(races_final_df)
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC #### Step 5 - Write data to datalake as parquet
 
 # COMMAND ----------
 
-races_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.races")
+races_final_df.write.mode("overwrite").format("delta").saveAsTable("f1_processed.races")
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT * FROM f1_processed.races
 
 # COMMAND ----------
 
