@@ -1,0 +1,49 @@
+{
+	"name": "databricks-formula-1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Ingestion_circuits",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/1.Ingest_circuit_files",
+					"baseParameters": {
+						"param_data_source": {
+							"value": "@variables('var_data_source')",
+							"type": "Expression"
+						},
+						"param_file_date": {
+							"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "Azure_Databricks",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"param_window_end_date": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"var_data_source": {
+				"type": "String",
+				"defaultValue": "Ergast"
+			}
+		},
+		"annotations": []
+	}
+}
