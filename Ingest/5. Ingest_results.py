@@ -95,4 +95,9 @@ dbutils.notebook.exit("Success")
 
 # COMMAND ----------
 
+# MAGIC %sql
+# MAGIC DESCRIBE DATABASE f1_processed;
+
+# COMMAND ----------
+
 
