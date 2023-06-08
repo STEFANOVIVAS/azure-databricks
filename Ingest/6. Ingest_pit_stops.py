@@ -69,11 +69,8 @@ pit_stops_final_df=add_ingestion_date(pit_stops_df).withColumnRenamed("driverId"
 
 # COMMAND ----------
 
-overwrite_partition(pit_stops_final_df, 'f1_processed','pit_stops','race_id')
-
-# COMMAND ----------
-
-dbutils.notebook.exit("Success")
+merge_condition="oldData.race_id=newData.race_id and oldData.driver_id=newData.driver_id and oldData.stop=newData.stop"
+merge_delta_data('f1_processed','pit_stops',processed_folder_path,pit_stops_final_df,'race_id',merge_condition)
 
 # COMMAND ----------
 
@@ -85,4 +82,4 @@ dbutils.notebook.exit("Success")
 
 # COMMAND ----------
 
-
+dbutils.notebook.exit("Success")

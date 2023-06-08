@@ -87,11 +87,18 @@ results_final_df=results_renamed_df.drop(col('statusId'))
 
 # COMMAND ----------
 
-overwrite_partition(results_final_df, 'f1_processed','results','race_id')
+merge_condition="oldData.result_id=newData.result_id and oldData.race_id=newData.race_id"
+merge_delta_data('f1_processed','results',processed_folder_path,results_final_df,'race_id',merge_condition)
 
 # COMMAND ----------
 
-dbutils.notebook.exit("Success")
+
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT distinct(race_id) FROM f1_processed.results
+# MAGIC order by race_id desc
 
 # COMMAND ----------
 
@@ -100,4 +107,14 @@ dbutils.notebook.exit("Success")
 
 # COMMAND ----------
 
+# MAGIC %sql
+# MAGIC SELECT race_id,driver_id,COUNT(*)
+# MAGIC FROM f1_processed.results
+# MAGIC
+# MAGIC GROUP BY race_id,driver_id
+# MAGIC HAVING COUNT(*) >1
+# MAGIC ORDER BY race_id,driver_id DESC
 
+# COMMAND ----------
+
+dbutils.notebook.exit("Success")

@@ -25,3 +25,18 @@ def overwrite_partition(input_df,db_name,table_name,partition_column):
     else:
         output_df.write.mode("overwrite").partitionBy(f"{partition_column}").format("parquet").saveAsTable(f"{db_name}.{table_name}")
 
+
+# COMMAND ----------
+
+def merge_delta_data(db_name,table_name, folder_path,input_df,partition_column,merge_condition):
+    spark.conf.set("spark.databricks.optimizer.dynamicPartitionPruning","true")
+    from delta.tables import DeltaTable
+    if (spark._jsparkSession.catalog().tableExists(f"{db_name}.{table_name}")):
+        deltaTable = DeltaTable.forPath(spark, f'{folder_path}/{table_name}')
+        deltaTable.alias("oldData").merge(input_df.alias("newData"),merge_condition) \
+        .whenMatchedUpdateAll() \
+        .whenNotMatchedInsertAll() \
+        .execute()
+
+    else:
+        input_df.write.mode("overwrite").partitionBy(f"{partition_column}").format("delta").saveAsTable(f"{db_name}.{table_name}")
