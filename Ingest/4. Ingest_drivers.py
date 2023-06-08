@@ -4,6 +4,16 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("param_data_source","")
+var_data_source=dbutils.widgets.get("param_data_source")
+
+# COMMAND ----------
+
+dbutils.widgets.text("param_file_date","2021-03-21")
+var_file_date=dbutils.widgets.get("param_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "../Includes/Configuration"
 
 # COMMAND ----------
@@ -33,7 +43,7 @@ driver_schema=StructType(fields=[StructField("code",StringType(),True),
 
 # COMMAND ----------
 
-drivers_df=spark.read.schema(driver_schema).json(f'{raw_folder_path}/drivers.json')
+drivers_df=spark.read.schema(driver_schema).json(f'{raw_folder_path}/{var_file_date}/drivers.json')
 
 # COMMAND ----------
 
@@ -50,7 +60,7 @@ from pyspark.sql.functions import col,current_timestamp,concat,lit
 
 # COMMAND ----------
 
-drivers_renamed_df=add_ingestion_date(drivers_df).withColumnRenamed("driverId","driver_id").withColumnRenamed("driverRef","driver_ref").withColumn("name",concat(col("name.forename"),lit(" "), col("name.surname")))
+drivers_renamed_df=add_ingestion_date(drivers_df).withColumnRenamed("driverId","driver_id").withColumnRenamed("driverRef","driver_ref").withColumn("name",concat(col("name.forename"),lit(" "), col("name.surname"))).withColumn("data_source",lit(var_data_source)).withColumn("file_date",lit(var_file_date))
 
 # COMMAND ----------
 
@@ -76,4 +86,4 @@ drivers_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_proce
 
 # COMMAND ----------
 
-
+dbutils.notebook.exit("Success")

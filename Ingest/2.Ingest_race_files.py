@@ -4,6 +4,16 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("param_data_source","")
+var_data_source=dbutils.widgets.get("param_data_source")
+
+# COMMAND ----------
+
+dbutils.widgets.text("param_file_date","2021-03-21")
+var_file_date=dbutils.widgets.get("param_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "../Includes/Configuration"
 
 # COMMAND ----------
@@ -27,7 +37,7 @@ races_schema=StructType(fields=[StructField("raceId",IntegerType(),False),
 
 # COMMAND ----------
 
-circuits_df=spark.read.option("header",True).schema(races_schema).csv(f'{raw_folder_path}/races.csv')
+circuits_df=spark.read.option("header",True).schema(races_schema).csv(f'{raw_folder_path}/{var_file_date}/races.csv')
 
 # COMMAND ----------
 
@@ -44,7 +54,7 @@ from pyspark.sql.functions import to_timestamp,concat,col,lit
 
 # COMMAND ----------
 
-races_transform_df=add_ingestion_date(circuits_df).withColumn("race_timestamp",to_timestamp(concat(col("date"),lit(" "),col("time")),'yyyy-MM-dd HH:mm:ss'))
+races_transform_df=add_ingestion_date(circuits_df).withColumn("race_timestamp",to_timestamp(concat(col("date"),lit(" "),col("time")),'yyyy-MM-dd HH:mm:ss')).withColumn("data_source",lit(var_data_source)).withColumn("file_date",lit(var_file_date))
 
 # COMMAND ----------
 
@@ -87,4 +97,4 @@ races_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_process
 
 # COMMAND ----------
 
-
+dbutils.notebook.exit("Success")

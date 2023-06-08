@@ -4,6 +4,16 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("param_data_source","")
+var_data_source=dbutils.widgets.get("param_data_source")
+
+# COMMAND ----------
+
+dbutils.widgets.text("param_file_date","2021-03-21")
+var_file_date=dbutils.widgets.get("param_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "../Includes/Configuration"
 
 # COMMAND ----------
@@ -29,7 +39,7 @@ pit_stops_schema=StructType(fields=[StructField("raceId",IntegerType(),False),
 
 # COMMAND ----------
 
-pit_stops_df=spark.read.schema(pit_stops_schema).option("multiline",True).json(f"{raw_folder_path}/pit_stops.json")
+pit_stops_df=spark.read.schema(pit_stops_schema).option("multiline",True).json(f"{raw_folder_path}/{var_file_date}/pit_stops.json")
 
 # COMMAND ----------
 
@@ -46,7 +56,11 @@ display(pit_stops_df)
 
 # COMMAND ----------
 
-pit_stops_final_df=add_ingestion_date(pit_stops_df).withColumnRenamed("driverId","driver_id").withColumnRenamed("raceId","race_id")
+from pyspark.sql.functions import lit
+
+# COMMAND ----------
+
+pit_stops_final_df=add_ingestion_date(pit_stops_df).withColumnRenamed("driverId","driver_id").withColumnRenamed("raceId","race_id").withColumn("data_source",lit(var_data_source)).withColumn("file_date",lit(var_file_date))
 
 # COMMAND ----------
 
@@ -55,7 +69,19 @@ pit_stops_final_df=add_ingestion_date(pit_stops_df).withColumnRenamed("driverId"
 
 # COMMAND ----------
 
-pit_stops_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.pit_stops")
+overwrite_partition(pit_stops_final_df, 'f1_processed','pit_stops','race_id')
+
+# COMMAND ----------
+
+dbutils.notebook.exit("Success")
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT race_id,count(*)
+# MAGIC FROM f1_processed.pit_stops
+# MAGIC GROUP BY race_id
+# MAGIC ORDER BY race_id DESC
 
 # COMMAND ----------
 

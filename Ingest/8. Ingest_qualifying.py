@@ -4,6 +4,16 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("param_data_source","")
+var_data_source=dbutils.widgets.get("param_data_source")
+
+# COMMAND ----------
+
+dbutils.widgets.text("param_file_date","2021-03-21")
+var_file_date=dbutils.widgets.get("param_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "../Includes/Configuration"
 
 # COMMAND ----------
@@ -31,7 +41,7 @@ qualifying_schema=StructType(fields=[StructField("raceId",IntegerType(),False),
 
 # COMMAND ----------
 
-qualifying_df=spark.read.option("multiline",True).json(f"{raw_folder_path}/qualifying/")
+qualifying_df=spark.read.option("multiline",True).json(f"{raw_folder_path}/{var_file_date}/qualifying/")
 
 # COMMAND ----------
 
@@ -48,7 +58,11 @@ display(qualifying_df)
 
 # COMMAND ----------
 
-qualifying_final_df=add_ingestion_date(qualifying_df).withColumnRenamed("driverId","driver_id").withColumnRenamed("raceId","race_id").withColumnRenamed("constructorId","constructor_id").withColumnRenamed("qualifyId","qualify_id")
+from pyspark.sql.functions import lit
+
+# COMMAND ----------
+
+qualifying_final_df=add_ingestion_date(qualifying_df).withColumnRenamed("driverId","driver_id").withColumnRenamed("raceId","race_id").withColumnRenamed("constructorId","constructor_id").withColumnRenamed("qualifyId","qualify_id").withColumn("data_source",lit(var_data_source)).withColumn("file_date",lit(var_file_date))
 
 # COMMAND ----------
 
@@ -61,7 +75,19 @@ display(qualifying_final_df)
 
 # COMMAND ----------
 
-qualifying_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.qualifying")
+overwrite_partition(qualifying_final_df, 'f1_processed','qualifying','race_id')
+
+# COMMAND ----------
+
+dbutils.notebook.exit("Success")
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT race_id,count(*)
+# MAGIC FROM f1_processed.qualifying
+# MAGIC GROUP BY race_id
+# MAGIC ORDER BY race_id DESC
 
 # COMMAND ----------
 
