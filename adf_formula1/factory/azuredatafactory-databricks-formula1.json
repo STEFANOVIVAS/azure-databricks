@@ -1,0 +1,9 @@
+{
+	"name": "azuredatafactory-databricks-formula1",
+	"location": "uksouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "aa888df3-1433-434a-af16-8cef3b9c3f96",
+		"tenantId": "4415efc0-fc02-4494-a228-5f6d13544717"
+	}
+}
