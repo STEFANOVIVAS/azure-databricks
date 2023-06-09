@@ -5,8 +5,14 @@
 		"factoryName": {
 			"value": "azuredatafactory-databricks-formula1"
 		},
+		"ls_databricks_adls_accountKey": {
+			"value": ""
+		},
 		"Azure_Databricks_properties_typeProperties_existingClusterId": {
 			"value": "0608-124419-o4ro4hi7"
+		},
+		"ls_databricks_adls_properties_typeProperties_url": {
+			"value": "https://formula1projectlake.dfs.core.windows.net/"
 		}
 	}
 }

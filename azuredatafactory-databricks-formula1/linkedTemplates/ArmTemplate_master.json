@@ -7,9 +7,17 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "azuredatafactory-databricks-formula1"
 		},
+		"ls_databricks_adls_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_databricks_adls'"
+		},
 		"Azure_Databricks_properties_typeProperties_existingClusterId": {
 			"type": "string",
 			"defaultValue": "0608-124419-o4ro4hi7"
+		},
+		"ls_databricks_adls_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://formula1projectlake.dfs.core.windows.net/"
 		},
 		"containerUri": {
 			"type": "string",
@@ -38,8 +46,14 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"ls_databricks_adls_accountKey": {
+						"value": "[parameters('ls_databricks_adls_accountKey')]"
+					},
 					"Azure_Databricks_properties_typeProperties_existingClusterId": {
 						"value": "[parameters('Azure_Databricks_properties_typeProperties_existingClusterId')]"
+					},
+					"ls_databricks_adls_properties_typeProperties_url": {
+						"value": "[parameters('ls_databricks_adls_properties_typeProperties_url')]"
 					}
 				}
 			},
