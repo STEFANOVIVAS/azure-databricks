@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Ingestion_circuits",
-				"type": "DatabricksNotebook",
+				"name": "Get Folders details",
+				"type": "GetMetadata",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -15,231 +15,287 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/1.Ingest_circuit_files",
-					"baseParameters": {
-						"param_data_source": {
-							"value": "@variables('var_data_source')",
-							"type": "Expression"
-						},
-						"param_file_date": {
-							"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
-							"type": "Expression"
+					"dataset": {
+						"referenceName": "databricks_formula1_raw",
+						"type": "DatasetReference",
+						"parameters": {
+							"param_window_end_date": {
+								"value": "@pipeline().parameters.param_window_end_date",
+								"type": "Expression"
+							}
 						}
+					},
+					"fieldList": [
+						"exists"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "JsonReadSettings"
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "Azure_Databricks",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
-				"name": "Ingestion_races",
-				"type": "DatabricksNotebook",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
+				"name": "If folder exists",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get Folders details",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/2.Ingest_race_files",
-					"baseParameters": {
-						"param_data_source": {
-							"value": "@variables('var_data_source')",
-							"type": "Expression"
+					"expression": {
+						"value": "@activity('Get Folders details').output.exists",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Ingestion_circuits",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/1.Ingest_circuit_files",
+								"baseParameters": {
+									"param_data_source": {
+										"value": "@variables('var_data_source')",
+										"type": "Expression"
+									},
+									"param_file_date": {
+										"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Azure_Databricks",
+								"type": "LinkedServiceReference"
+							}
 						},
-						"param_file_date": {
-							"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
-							"type": "Expression"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "Azure_Databricks",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "Ingestion_drivers",
-				"type": "DatabricksNotebook",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/4. Ingest_drivers",
-					"baseParameters": {
-						"param_data_source": {
-							"value": "@variables('var_data_source')",
-							"type": "Expression"
+						{
+							"name": "Ingestion_races",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/2.Ingest_race_files",
+								"baseParameters": {
+									"param_data_source": {
+										"value": "@variables('var_data_source')",
+										"type": "Expression"
+									},
+									"param_file_date": {
+										"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Azure_Databricks",
+								"type": "LinkedServiceReference"
+							}
 						},
-						"param_file_date": {
-							"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
-							"type": "Expression"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "Azure_Databricks",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "Ingestion_constructors",
-				"type": "DatabricksNotebook",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/3. Ingest_constructors",
-					"baseParameters": {
-						"param_data_source": {
-							"value": "@variables('var_data_source')",
-							"type": "Expression"
+						{
+							"name": "Ingestion_drivers",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/4. Ingest_drivers",
+								"baseParameters": {
+									"param_data_source": {
+										"value": "@variables('var_data_source')",
+										"type": "Expression"
+									},
+									"param_file_date": {
+										"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Azure_Databricks",
+								"type": "LinkedServiceReference"
+							}
 						},
-						"param_file_date": {
-							"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
-							"type": "Expression"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "Azure_Databricks",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "Ingestion_results",
-				"type": "DatabricksNotebook",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/5. Ingest_results",
-					"baseParameters": {
-						"param_data_source": {
-							"value": "@variables('var_data_source')",
-							"type": "Expression"
+						{
+							"name": "Ingestion_constructors",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/3. Ingest_constructors",
+								"baseParameters": {
+									"param_data_source": {
+										"value": "@variables('var_data_source')",
+										"type": "Expression"
+									},
+									"param_file_date": {
+										"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Azure_Databricks",
+								"type": "LinkedServiceReference"
+							}
 						},
-						"param_file_date": {
-							"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
-							"type": "Expression"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "Azure_Databricks",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "Ingestion_pit_stops",
-				"type": "DatabricksNotebook",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/6. Ingest_pit_stops",
-					"baseParameters": {
-						"param_data_source": {
-							"value": "@variables('var_data_source')",
-							"type": "Expression"
+						{
+							"name": "Ingestion_results",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/5. Ingest_results",
+								"baseParameters": {
+									"param_data_source": {
+										"value": "@variables('var_data_source')",
+										"type": "Expression"
+									},
+									"param_file_date": {
+										"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Azure_Databricks",
+								"type": "LinkedServiceReference"
+							}
 						},
-						"param_file_date": {
-							"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
-							"type": "Expression"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "Azure_Databricks",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "Ingestion_lap_times",
-				"type": "DatabricksNotebook",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/7. Ingest_lap_times",
-					"baseParameters": {
-						"param_data_source": {
-							"value": "@variables('var_data_source')",
-							"type": "Expression"
+						{
+							"name": "Ingestion_pit_stops",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/6. Ingest_pit_stops",
+								"baseParameters": {
+									"param_data_source": {
+										"value": "@variables('var_data_source')",
+										"type": "Expression"
+									},
+									"param_file_date": {
+										"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Azure_Databricks",
+								"type": "LinkedServiceReference"
+							}
 						},
-						"param_file_date": {
-							"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
-							"type": "Expression"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "Azure_Databricks",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "Ingestion_qualifying",
-				"type": "DatabricksNotebook",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/8. Ingest_qualifying",
-					"baseParameters": {
-						"param_data_source": {
-							"value": "@variables('var_data_source')",
-							"type": "Expression"
+						{
+							"name": "Ingestion_lap_times",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/7. Ingest_lap_times",
+								"baseParameters": {
+									"param_data_source": {
+										"value": "@variables('var_data_source')",
+										"type": "Expression"
+									},
+									"param_file_date": {
+										"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Azure_Databricks",
+								"type": "LinkedServiceReference"
+							}
 						},
-						"param_file_date": {
-							"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
-							"type": "Expression"
+						{
+							"name": "Ingestion_qualifying",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Ingest/8. Ingest_qualifying",
+								"baseParameters": {
+									"param_data_source": {
+										"value": "@variables('var_data_source')",
+										"type": "Expression"
+									},
+									"param_file_date": {
+										"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Azure_Databricks",
+								"type": "LinkedServiceReference"
+							}
 						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "Azure_Databricks",
-					"type": "LinkedServiceReference"
+					]
 				}
 			}
 		],
