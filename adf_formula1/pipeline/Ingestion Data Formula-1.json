@@ -1,5 +1,5 @@
 {
-	"name": "databricks-formula-1",
+	"name": "Ingestion Data Formula-1",
 	"properties": {
 		"activities": [
 			{
@@ -30,6 +30,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {

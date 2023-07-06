@@ -1,0 +1,194 @@
+{
+	"name": "Transform Data Formula-1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Folders details",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "databricks_formula1_raw",
+						"type": "DatasetReference",
+						"parameters": {
+							"param_window_end_date": {
+								"value": "@pipeline().parameters.param_window_end_date",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"exists"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "JsonReadSettings"
+					}
+				}
+			},
+			{
+				"name": "If folder exists",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get Folders details",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@activity('Get Folders details').output.exists",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Transform race results",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Transformation/1.Race results",
+								"baseParameters": {
+									"param_file_date": {
+										"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Azure_Databricks",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Transform drivers standings",
+							"type": "DatabricksNotebook",
+							"dependsOn": [
+								{
+									"activity": "Transform race results",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Transformation/2. Drivers standings",
+								"baseParameters": {
+									"param_file_date": {
+										"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Azure_Databricks",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Transform constructors standings",
+							"type": "DatabricksNotebook",
+							"dependsOn": [
+								{
+									"activity": "Transform race results",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Transformation/3. Constructors standings",
+								"baseParameters": {
+									"param_file_date": {
+										"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Azure_Databricks",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Transform calculated race results",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Transformation/4. calculated_race_results",
+								"baseParameters": {
+									"param_file_date": {
+										"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Azure_Databricks",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"param_window_end_date": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"var_data_source": {
+				"type": "String",
+				"defaultValue": "Ergast"
+			}
+		},
+		"annotations": []
+	}
+}
