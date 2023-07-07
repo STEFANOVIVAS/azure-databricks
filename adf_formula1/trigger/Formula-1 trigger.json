@@ -2,7 +2,16 @@
 	"name": "Formula-1 trigger",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Stopped",
+		"runtimeState": "Started",
+		"pipeline": {
+			"pipelineReference": {
+				"referenceName": "Processed Data Formula-1",
+				"type": "PipelineReference"
+			},
+			"parameters": {
+				"param_window_end_date": "@trigger().outputs.windowEndTime"
+			}
+		},
 		"type": "TumblingWindowTrigger",
 		"typeProperties": {
 			"frequency": "Hour",
