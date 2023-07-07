@@ -19,7 +19,7 @@
 			"type": "string",
 			"defaultValue": "https://formula1projectlake.dfs.core.windows.net/"
 		},
-		"Formula-1 trigger_properties_pipeline_parameters_param_window_end_date": {
+		"trigger_F1_properties_pipeline_parameters_param_window_end_date": {
 			"type": "string",
 			"defaultValue": "@trigger().outputs.windowEndTime"
 		}
@@ -717,7 +717,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Formula-1 trigger')]",
+			"name": "[concat(parameters('factoryName'), '/trigger_F1')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -729,7 +729,7 @@
 						"type": "PipelineReference"
 					},
 					"parameters": {
-						"param_window_end_date": "[parameters('Formula-1 trigger_properties_pipeline_parameters_param_window_end_date')]"
+						"param_window_end_date": "[parameters('trigger_F1_properties_pipeline_parameters_param_window_end_date')]"
 					}
 				},
 				"type": "TumblingWindowTrigger",

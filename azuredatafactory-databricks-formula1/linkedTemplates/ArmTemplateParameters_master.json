@@ -14,7 +14,7 @@
 		"ls_databricks_adls_properties_typeProperties_url": {
 			"value": "https://formula1projectlake.dfs.core.windows.net/"
 		},
-		"Formula-1 trigger_properties_pipeline_parameters_param_window_end_date": {
+		"trigger_F1_properties_pipeline_parameters_param_window_end_date": {
 			"value": "@trigger().outputs.windowEndTime"
 		},
 		"containerUri": {
