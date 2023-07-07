@@ -18,6 +18,10 @@
 		"ls_databricks_adls_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://formula1projectlake.dfs.core.windows.net/"
+		},
+		"Formula-1 trigger_properties_pipeline_parameters_param_window_end_date": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowEndTime"
 		}
 	},
 	"variables": {
@@ -109,7 +113,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/databricks-formula-1')]",
+			"name": "[concat(parameters('factoryName'), '/Ingestion Data Formula-1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -432,6 +436,318 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/databricks_formula1_raw')]",
 				"[concat(variables('factoryId'), '/linkedServices/Azure_Databricks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Transform Data Formula-1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Folders details",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "databricks_formula1_raw",
+								"type": "DatasetReference",
+								"parameters": {
+									"param_window_end_date": {
+										"value": "@pipeline().parameters.param_window_end_date",
+										"type": "Expression"
+									}
+								}
+							},
+							"fieldList": [
+								"exists"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "JsonReadSettings"
+							}
+						}
+					},
+					{
+						"name": "If folder exists",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Get Folders details",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@activity('Get Folders details').output.exists",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "Transform race results",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Transformation/1.Race results",
+										"baseParameters": {
+											"param_file_date": {
+												"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Azure_Databricks",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Transform drivers standings",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "Transform race results",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Transformation/2. Drivers standings",
+										"baseParameters": {
+											"param_file_date": {
+												"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Azure_Databricks",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Transform constructors standings",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "Transform race results",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Transformation/3. Constructors standings",
+										"baseParameters": {
+											"param_file_date": {
+												"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Azure_Databricks",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Transform calculated race results",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Repos/tefinhovivas@hotmail.com/azure-databricks-project/Transformation/4. calculated_race_results",
+										"baseParameters": {
+											"param_file_date": {
+												"value": "@formatDateTime(pipeline().parameters.param_window_end_date,'yyyy-MM-dd')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Azure_Databricks",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"param_window_end_date": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"var_data_source": {
+						"type": "String",
+						"defaultValue": "Ergast"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/databricks_formula1_raw')]",
+				"[concat(variables('factoryId'), '/linkedServices/Azure_Databricks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Processed Data Formula-1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Execute Ingestion Pipeline",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Ingestion Data Formula-1",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"param_window_end_date": {
+									"value": "@pipeline().parameters.param_window_end_date",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Execute Transform Pipeline",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Execute Ingestion Pipeline",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Transform Data Formula-1",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"param_window_end_date": {
+									"value": "@pipeline().parameters.param_window_end_date",
+									"type": "Expression"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"param_window_end_date": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"var_data_source": {
+						"type": "String",
+						"defaultValue": "Ergast"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Ingestion Data Formula-1')]",
+				"[concat(variables('factoryId'), '/pipelines/Transform Data Formula-1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Formula-1 trigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "Processed Data Formula-1",
+						"type": "PipelineReference"
+					},
+					"parameters": {
+						"param_window_end_date": "[parameters('Formula-1 trigger_properties_pipeline_parameters_param_window_end_date')]"
+					}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Hour",
+					"interval": 168,
+					"startTime": "2021-03-14T10:00:00Z",
+					"endTime": "2021-04-25T10:00:00Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Processed Data Formula-1')]"
 			]
 		}
 	]
