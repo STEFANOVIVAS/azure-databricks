@@ -1,7 +1,7 @@
-## Azure Formula1 project
+# Azure Formula1 project
 Azure Formula1 project is an implementation of the data pipeline which consumes data from the Ergast API and makes F1 drivers/constructors standings available for Business Intelligence consumption. The pipeline infrastructure was built using Microsoft Azure as a backbone with ADLS Gen 2 as Datalake, Databricks/Spark as a data transformation framework, and Data Factory as an orchestrator.
 
-### Table of contents
+## Table of contents
   * [Data Architecture Diagram](#data-architecture-diagram) 
   * [Ergast API table schema](#ergast-api-table-schema)
   * [How it works](#how-it-works)
@@ -12,15 +12,15 @@ Azure Formula1 project is an implementation of the data pipeline which consumes 
   * [Prerequisites](#prerequisites)      
 
 
-### Data Architecture Diagram
+## Data Architecture Diagram
 <img src="Data architecture.png">
 
-### Ergast API Table Schema
+## Ergast API Table Schema
 <img src="ergast_db.png">
 
-### How it works
+## How it works
 
-#### Data Project Overview
+### Data Project Overview
 
 These are the files from the Ergast API and the respective file formats that are used in this project, so different approaches are needed from the spark API to read each type of file.
 
@@ -60,7 +60,7 @@ These are the files from the Ergast API and the respective file formats that are
 
 </table>
 
-#### Data Ingestion Requirements
+### Data Ingestion Requirements
 
 * Ingest all 8 files into the data lake.
 * Ingested Data must have the schema applied.
@@ -72,18 +72,18 @@ These are the files from the Ergast API and the respective file formats that are
 * Join the key information required for analysis to create a new table.
 * Transformed tables must have audit columns.
 
-#### Reporting requirements
+### Reporting requirements
 
 * Driver standings for each year.
 * Constructor Standings for each year.
 
-#### Analysis Requirements
+### Analysis Requirements
 
 * Most dominant drivers over the years.
 * Most dominant Constructors over the years.
 * Visualize the outputs.
 
-### Prerequisites
+## Prerequisites
   
 
 
