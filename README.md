@@ -84,6 +84,10 @@ These are the files from the Ergast API and the respective file formats that are
 * Visualize the outputs.
 
 ## Prerequisites
+
+* Microsoft Azure account
+* Azure Databricks Service
+* Azure Data Factory
   
 
 
