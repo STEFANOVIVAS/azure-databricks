@@ -1,5 +1,5 @@
 ## Azure Formula1 project
-Azure Formula1 project is an implementation of the data pipeline which consumes data from the Ergast API and makes F1 drivers/constructors standings available for Business Intelligence consumption. The pipeline infrastructure was built using Microsoft Azure as a backbone with ADLS Gen 2 as Datalake, Databricks/Spark as a data transformation framework, and Data Factory as an orchestration.
+Azure Formula1 project is an implementation of the data pipeline which consumes data from the Ergast API and makes F1 drivers/constructors standings available for Business Intelligence consumption. The pipeline infrastructure was built using Microsoft Azure as a backbone with ADLS Gen 2 as Datalake, Databricks/Spark as a data transformation framework, and Data Factory as an orchestrator.
 
 ### Table of contents
 
@@ -57,6 +57,17 @@ These are the files from the Ergast API and the respective file formats that are
 * Join the key information required for reporting to create a new table.
 * Join the key information required for analysis to create a new table.
 * Transformed tables must have audit columns.
+
+### Reporting requirements
+
+* Driver standings for each year.
+* Constructor Standings for each year.
+
+### Analysis Requirements
+
+* Most dominant drivers over the years.
+* Most dominant Constructors over the years.
+* Visualize the outputs.
   
 
 ### Data Architecture Diagram
